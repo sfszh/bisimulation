@@ -1,3 +1,5 @@
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -52,6 +54,35 @@ class Process {
         this.transitions = new HashSet<Transition>();
     }
 
+	public Process(BufferedReader br, String processName) throws IOException {
+        this.states = new HashSet<String>();
+        this.actions = new HashSet<String>();
+        this.transitions = new HashSet<Transition>();
+		String line = "";
+		try {
+			while (line != null) {
+				line = br.readLine();
+				if (line.startsWith("!"))
+					return;
+
+				String values[] = line.split("[,:]"), // values:
+						source = processName + values[0].trim(), // start
+						action = values[1].trim(), // action
+						destination = processName + values[2].trim(); // end
+
+				this.states.add(source);
+				this.actions.add(action);
+				this.states.add(destination);
+				this.transitions.add(new Process.Transition(source, destination, action));
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.err.println("maybe you should end file with \"!\" in " + processName);
+			System.exit(-1);
+		}
+
+	}
+    
     /**
      * Iterates through a list and appends ',' where needed
      * @param str - string to look at
